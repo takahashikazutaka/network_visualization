@@ -1,0 +1,33 @@
+dat=scan(file.choose(), what="character",sep="\n")
+# scan in a file with IDs as character strings {even if numeric"}, and with fields separated by commas; sample input file is "sample_adjlist.txt"
+dym=length(dat) 
+# stores the numvber of lines in the file
+dat=gsub(","," ",dat)
+# convert commas to spaces and add a space {in case the input file lacks any spaces after a comma}
+dat=gsub("[ ]+$","",gsub("[ ]+"," ",dat));
+# remove trailing and multiple spaces
+m<-matrix(data=0,nrow=dym,ncol=dym) 
+# create a dymXdym matrix of zeros
+adjlist=strsplit(dat," ")
+# split the file into a list of length "dym" with distinct elements. N.B. adjlist[[1]][1] calls the first element in the vector of characters in adjlist
+
+ids=adjlist[[1]][1]
+# creates ids of type character to initiate header list of node IDs
+for (i in 2:dym) {ids=c(ids,adjlist[[i]][1])}
+# creates a character object with the list names
+for (i in 1:dym) {adjlist[[i]]=adjlist[[i]][2:length(adjlist[[i]])]}
+# strips the first column {which is now in "ids"} from adjlist 
+
+tfmat=adjlist
+for(i in 1:dym) {tfmat[[i]]<-ids %in% tfmat[[i]]}
+# converts tfmat into lists of T-F of length dym of which elements of adjlist[[i]] occur in the ids header
+
+for(j in 1:dym){for(i in 1:dym){if(tfmat[[j]][i]==T){m[j,i]<-1}}} 
+# turns cells of matrix m, corresponding to cells in tfmat having value T, into 1s
+
+adjmat=data.frame(m,row.names=ids,check.names=F)
+# creates a dataframe "adjmat" with 0/1 values from m and row names from "ids"
+names(adjmat)<-ids
+# changes header names to the "ids" vector of ID values
+adjmat
+ls()
